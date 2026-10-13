@@ -128,6 +128,8 @@ nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-si
 nav button.on{color:var(--teal)}nav svg{width:22px;height:22px}
 nav .mid{width:56px;height:56px;border-radius:50%;margin-top:-30px;background:linear-gradient(135deg,var(--teal),#0aa893);color:#02221d;justify-content:center;box-shadow:0 8px 24px -4px var(--teal);border:4px solid var(--bg)}
 nav .mid svg{width:26px;height:26px}
+#fab{position:fixed;right:18px;bottom:100px;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#0aa893);color:#02221d;display:grid;place-items:center;box-shadow:0 8px 24px -4px var(--teal);z-index:29;border:0;cursor:pointer}
+#fab svg{width:26px;height:26px}
 button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important}}
 </style>
@@ -249,6 +251,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
   <button data-go="eng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Engineering</button>
   <button data-go="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg>Profile</button>
 </nav>
+<button id="fab" data-go="chat" aria-label="Chat with Leo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></button>
 </div>
 
 <script>
@@ -328,6 +331,7 @@ function show(id){
   $$('.view').forEach(function(v){v.classList.toggle('on',v.id===id)});
   $$('nav button').forEach(function(b){b.classList.toggle('on',b.dataset.go===id)});
   window.scrollTo(0,0);
+  var fab=$('#fab');if(fab)fab.classList.toggle('hide',id==='chat');
 }
 document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)show(b.dataset.go)});
 
@@ -373,7 +377,7 @@ $$('[data-ai]').forEach(function(b){b.onclick=function(){
     out.innerHTML='';
     if(d.image){var i=new Image();i.src=d.image;out.appendChild(i)}
     if(d.text){var t=document.createElement('div');t.className='res';t.textContent=d.text;out.appendChild(t)}
-  },function(m){out.textContent=(m||'Something went wrong. Try again.')+' No credits were used.'},img);
+  },function(m){out.textContent=m||'Something went wrong. Try again.'},img);
 }});
 
 /* Attach an image (resized to keep uploads small) */
