@@ -1,1 +1,396 @@
-<h1>Legend Tech</h1>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070a0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LegendTech">
+<title>LegendTech | AI Studio & Engineering Hub</title>
+<meta name="description" content="LegendTech: professional AI studio and engineering hub.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070a0d;--bg2:#0d1217;--card:rgba(255,255,255,.04);--line:rgba(255,255,255,.09);--text:#f1f5f9;--mut:#8d99a8;--teal:#19d3b8;--gold:#ffc83a;--input:rgba(255,255,255,.05);--g1:rgba(25,211,184,.22);--g2:rgba(255,200,58,.14)}
+[data-theme=light]{--bg:#f3f6f9;--bg2:#fff;--card:#fff;--line:rgba(10,20,30,.1);--text:#0b1620;--mut:#586676;--teal:#0aa893;--gold:#c38a00;--input:#f0f3f6;--g1:rgba(10,168,147,.16);--g2:rgba(195,138,0,.1)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(700px 420px at 90% -5%,var(--g1),transparent 60%),radial-gradient(600px 400px at -10% 40%,var(--g2),transparent 60%),var(--bg);color:var(--text);font-family:Manrope,system-ui,sans-serif;min-height:100vh;padding-bottom:104px;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:680px;margin:0 auto;padding:0 20px}
+.hide{display:none!important}
+
+/* Logo */
+.mark{overflow:visible;animation:float 5s ease-in-out infinite}
+.ring{transform-box:fill-box;transform-origin:center;animation:spin 14s linear infinite}
+.orb{animation:pulse 3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes float{50%{transform:translateY(-3px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.12)}}
+.word{font-weight:800;letter-spacing:-.03em}.word b{color:var(--teal)}
+
+/* Intro + loader */
+#intro{position:fixed;inset:0;z-index:70;background:#05080a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#f1f5f9;transition:opacity .8s,visibility .8s}
+#intro.done{opacity:0;visibility:hidden}
+#intro::before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(25,211,184,.35),transparent 65%);animation:glow 3s ease-out both}
+#intro .mark{width:130px;height:130px;animation:none;position:relative}
+#intro .L{stroke-dasharray:170;stroke-dashoffset:170;animation:draw 1.1s .3s ease-out forwards}
+#intro .ring{animation:spin 14s linear infinite,fade 1s 1s both}
+#intro .orb,#intro .hl{animation:drop 1s 1.1s cubic-bezier(.3,1.5,.5,1) both}
+#intro .word{font-size:2.1rem;animation:rise .8s 1.8s both;position:relative}
+#intro .sub{color:#8d99a8;letter-spacing:.34em;font-size:.68rem;animation:rise .8s 2.1s both;position:relative}
+#intro .bar{width:140px;height:3px;background:#1a2229;border-radius:3px;overflow:hidden;position:relative}
+#intro .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#19d3b8,#ffc83a);animation:fill 3.4s ease-in-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes drop{from{transform:translate(30px,-70px) scale(0);opacity:0}}
+@keyframes rise{from{transform:translateY(12px);opacity:0}}
+@keyframes fade{from{opacity:0}}
+@keyframes glow{from{transform:scale(.3);opacity:0}}
+@keyframes fill{to{width:100%}}
+#load{position:fixed;inset:0;z-index:65;background:rgba(5,8,10,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;font-weight:700;font-size:.9rem}
+#load.on{display:flex}
+.spin{width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:var(--teal);border-right-color:var(--gold);animation:spin .9s linear infinite;position:relative}
+.spin::after{content:"";position:absolute;inset:18px;border-radius:50%;background:var(--gold);box-shadow:0 0 18px var(--gold);animation:pulse 1s infinite}
+
+/* Header */
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;max-width:680px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-size:1.3rem}
+.brand .mark{width:40px;height:40px}
+.hr{display:flex;align-items:center;gap:10px}
+.credits{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:8px}
+.credits i{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#0b7f70) center/cover;color:#fff;font-weight:800;display:grid;place-items:center;border:2px solid var(--line)}
+
+/* Views */
+.view{display:none;padding-top:26px}.view.on{display:block}
+.hero{position:relative;border:1px solid var(--line);border-radius:26px;padding:28px 24px;overflow:hidden;background:linear-gradient(145deg,var(--g1),transparent 55%),var(--card);box-shadow:0 20px 60px -30px var(--teal)}
+.hero .big{position:absolute;right:-20px;top:-10px;width:200px;height:200px;opacity:.9;filter:drop-shadow(0 0 30px rgba(25,211,184,.5))}
+.hero .big svg{width:100%;height:100%}
+h1{font-weight:800;font-size:clamp(2.4rem,11vw,3.5rem);line-height:1.03;letter-spacing:-.04em;position:relative}
+h1 span{background:linear-gradient(90deg,var(--teal),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--mut);font-size:1rem;margin:16px 0 22px;max-width:360px;line-height:1.55;position:relative}
+.btn{border-radius:14px;padding:15px;font-weight:700;font-size:.92rem;background:var(--input);border:1px solid var(--line);text-align:center;display:block}
+.btn.teal{background:linear-gradient(135deg,var(--teal),#0aa893);color:#02221d;border-color:transparent;box-shadow:0 8px 24px -8px var(--teal)}
+.btn.gold{background:linear-gradient(135deg,#ffd75e,#e8a900);color:#1a1200;border-color:transparent;width:100%;box-shadow:0 8px 24px -8px var(--gold)}
+.btn.red{color:#ef5b53}
+.hero .btn{display:inline-block;padding:14px 26px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.tile,.card,.support{background:var(--card);border:1px solid var(--line);border-radius:20px}
+.tile{padding:22px 18px;text-align:left;transition:.2s;display:block;position:relative;overflow:hidden}
+.tile::after{content:"";position:absolute;right:-30px;bottom:-30px;width:110px;height:110px;border-radius:50%;background:var(--c);opacity:.25;filter:blur(24px)}
+.tile:hover{transform:translateY(-3px);border-color:var(--c)}
+.tile svg{width:32px;height:32px;margin-bottom:26px;display:block}
+.tile b{display:block;font-size:1.08rem}.tile span{color:var(--mut);font-size:.85rem;line-height:1.4;display:block;margin-top:4px}
+.support{display:flex;align-items:center;gap:16px;padding:18px 20px;margin-top:12px}
+.support svg{width:30px;height:30px;flex:none}.support b{display:block}.support span{color:var(--mut);font-size:.9rem}
+h2{font-size:1.9rem;font-weight:800;letter-spacing:-.03em;margin-bottom:18px}
+.card{padding:24px;margin-bottom:16px}
+.card h3{font-size:1rem;font-weight:800;margin-bottom:4px}.card .d{color:var(--mut);font-size:.88rem;margin-bottom:16px}
+input,textarea,select{width:100%;background:var(--input);border:1px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--text);font:inherit;font-size:.95rem;margin-bottom:12px}
+textarea{min-height:92px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--teal)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.out,.msg{color:var(--mut);font-size:.88rem;margin-top:10px;min-height:1.2em}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.seg.two{grid-template-columns:1fr 1fr}
+.seg button{padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--input);font-weight:700;font-size:.88rem}
+.seg button.on{border-color:var(--teal);color:var(--teal);box-shadow:0 0 0 1px var(--teal) inset}
+.prof{display:flex;align-items:center;gap:16px;margin-bottom:16px}.prof .av{width:70px;height:70px;font-size:1.5rem}
+.file{font-size:.88rem;color:var(--teal);font-weight:700;cursor:pointer}
+
+/* Credits page */
+.bal{display:flex;align-items:center;gap:20px;background:linear-gradient(145deg,var(--g2),transparent 60%),var(--card)}
+.donut{width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--teal) var(--p,0%),var(--input) 0);display:grid;place-items:center;flex:none}
+.donut::after{content:"";width:74px;height:74px;border-radius:50%;background:var(--bg2);grid-area:1/1}
+.donut i{grid-area:1/1;z-index:1;font-style:normal;font-weight:800;font-size:.8rem}
+.bal b{font-size:2rem;letter-spacing:-.03em;display:block}.bal span{color:var(--mut);font-size:.88rem}
+.pack{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:var(--input);border-radius:16px;padding:16px 18px;margin-bottom:10px;width:100%;font-weight:700;text-align:left}
+.pack small{display:block;color:var(--mut);font-weight:500}
+.pack.on{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal) inset}
+.hist div{display:flex;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line);font-size:.9rem}
+
+/* Sign in */
+#auth{position:fixed;inset:0;z-index:50;background:radial-gradient(700px 420px at 50% -10%,var(--g1),transparent 60%),var(--bg);overflow:auto;display:flex;align-items:center;justify-content:center;padding:24px}
+.box{width:100%;max-width:400px}.box .mark{width:64px;height:64px;margin-bottom:16px}
+.box h2{margin-bottom:6px}.box .lead{margin:0 0 20px;max-width:none}
+.soc{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;margin-bottom:10px;border-radius:14px;padding:14px;font-weight:700;border:1px solid var(--line);background:var(--card)}
+.soc svg{width:20px;height:20px}
+.or{text-align:center;color:var(--mut);font-size:.8rem;margin:16px 0}
+
+.msgs{display:flex;flex-direction:column;gap:10px;min-height:260px;max-height:50vh;overflow-y:auto;margin-bottom:14px}
+.m{max-width:85%;padding:12px 15px;border-radius:16px;font-size:.93rem;line-height:1.5;white-space:pre-wrap}
+.m.bot{background:var(--input);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.m.me{background:linear-gradient(135deg,var(--teal),#0aa893);color:#02221d;align-self:flex-end;border-bottom-right-radius:4px;font-weight:600}
+.send{display:flex;gap:8px}.send input{margin:0}.send .btn{flex:none;padding:0 20px}
+.out img{width:100%;border-radius:14px;margin-top:10px}.out .res{white-space:pre-wrap;color:var(--text);line-height:1.55;margin-top:6px}
+nav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:540px;background:var(--bg2);border:1px solid var(--line);border-radius:24px;display:flex;justify-content:space-around;align-items:center;padding:8px;z-index:30;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.66rem;font-weight:700;color:var(--mut);padding:6px 8px}
+nav button.on{color:var(--teal)}nav svg{width:22px;height:22px}
+nav .mid{width:56px;height:56px;border-radius:50%;margin-top:-30px;background:linear-gradient(135deg,var(--teal),#0aa893);color:#02221d;justify-content:center;box-shadow:0 8px 24px -4px var(--teal);border:4px solid var(--bg)}
+nav .mid svg{width:26px;height:26px}
+button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5df5de"/><stop offset=".5" stop-color="#19d3b8"/><stop offset="1" stop-color="#0a8a79"/></linearGradient>
+<linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#ffc83a"/><stop offset="1" stop-color="#c88a00"/></linearGradient>
+<linearGradient id="rg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#19d3b8"/><stop offset="1" stop-color="#ffc83a"/></linearGradient>
+</defs></svg>
+
+<div id="intro"><span data-logo></span><div class="word">Legend<b>Tech</b></div><div class="sub">IMAGINE. BUILD. AUTOMATE.</div><div class="bar"><i></i></div></div>
+<div id="load"><div class="spin"></div><span id="ltxt">Loading...</span></div>
+
+<div id="auth" class="hide"><div class="box">
+  <span data-logo></span>
+  <h2>Welcome to LegendTech</h2>
+  <p class="lead">Sign in to use the AI Studio and manage your credits.</p>
+  <button class="soc" data-p="google"><svg viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3-3A10 10 0 0 0 2.2 7.4l3.5 2.7C6.5 7.300 9 5 12 5Z"/><path fill="#4285F4" d="M21.800 12.200c0-.7-.1-1.300-.2-1.900H12v3.700h5.500a4.700 4.700 0 0 1-2 3.100l3.200 2.500c1.900-1.700 3.100-4.300 3.100-7.400Z"/><path fill="#FBBC05" d="M5.700 14.100a6 6 0 0 1 0-4L2.200 7.400a10 10 0 0 0 0 9.200l3.500-2.500Z"/><path fill="#34A853" d="M12 22c2.700 0 5-.9 6.600-2.400l-3.200-2.500c-.9.600-2 1-3.400 1-3 0-5.500-2-6.300-4.700l-3.500 2.700A10 10 0 0 0 12 22Z"/></svg>Continue with Google</button>
+  <button class="soc" data-p="github"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.200 19.500c.5.1.7-.2.7-.5v-1.800c-2.800.6-3.400-1.200-3.400-1.200-.5-1.200-1.100-1.500-1.100-1.500-.9-.6.1-.6.1-.6 1 .1 1.500 1 1.500 1 .9 1.500 2.300 1.100 2.900.8.1-.7.3-1.100.6-1.300-2.200-.3-4.600-1.100-4.600-5 0-1.100.4-2 1-2.700-.1-.3-.4-1.300.1-2.700 0 0 .8-.3 2.800 1a9.600 9.600 0 0 1 5 0c1.900-1.300 2.800-1 2.800-1 .5 1.400.2 2.400.1 2.700.6.700 1 1.600 1 2.700 0 3.900-2.400 4.700-4.600 5 .4.300.7.900.7 1.800v2.700c0 .3.2.6.7.5A10 10 0 0 0 12 2Z"/></svg>Continue with GitHub</button>
+  <div class="or">or use your details</div>
+  <input id="lname" placeholder="Your name" autocomplete="name">
+  <input id="lmail" type="email" placeholder="Email address" autocomplete="email">
+  <button class="btn teal" id="signin" style="width:100%">Sign in</button>
+  <p class="msg" id="lmsg"></p>
+</div></div>
+
+<div id="app" class="hide">
+<header>
+  <div class="brand"><span data-logo></span><span class="word">Legend<b>Tech</b></span></div>
+  <div class="hr">
+    <button class="credits" data-go="credits" aria-label="Credits"><i></i><span class="cr">0</span></button>
+    <button class="av" id="hav" data-go="settings" aria-label="Settings">L</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="view on" id="home">
+    <div class="hero">
+      <span class="big" data-logo></span>
+      <h1>Imagine.<br>Build.<br><span>Automate.</span></h1>
+      <p class="lead">Professional AI studio and engineering hub. Create designs, websites and technical projects.</p>
+      <button class="btn teal" data-go="studio">Get started</button>
+    </div>
+    <div class="grid">
+      <button class="tile" style="--c:#19d3b8" data-go="studio"><svg viewBox="0 0 24 24" fill="none" stroke="#19d3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a3 3 0 0 0-3-1Z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1V5a3 3 0 0 1 3-1Z"/></svg><b>AI Studio</b><span>Websites, flyers and images from a short description.</span></button>
+      <button class="tile" style="--c:#ffc83a" data-go="eng"><svg viewBox="0 0 24 24" fill="none" stroke="#ffc83a" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg><b>Engineering</b><span>Electrical and robotics projects, from idea to product.</span></button>
+    </div>
+    <button class="tile" style="--c:#19d3b8;margin-top:12px;width:100%" data-go="chat"><svg viewBox="0 0 24 24" fill="none" stroke="#19d3b8" stroke-width="1.5" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg><b>Chat with Leo</b><span>Ask questions or tell Leo what you want to create.</span></button>
+    <a class="support" href="https://wa.me/2347072167082" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linejoin="round"><path d="M4 20l1.2-4A8 8 0 1 1 8 19l-4 1Z"/></svg>
+      <div><b>Official Support</b><span>Call or chat: 0707 216 7082</span></div>
+    </a>
+  </section>
+
+  <section class="view" id="studio">
+    <h2>AI Studio</h2>
+    <div class="card"><h3>Web Architect</h3><p class="d">Describe a business and get a website for it.</p>
+      <input placeholder="Business name (e.g. Zara Logistics)"><textarea placeholder="What does this business do?"></textarea>
+      <div class="row"><button class="btn" data-ai="web" data-cost="0">Free preview</button><button class="btn teal" data-ai="web" data-cost="1000">Build · 1,000 cr</button></div><div class="out" id="o-web"></div></div>
+    <div class="card"><h3>Ad Studio</h3><p class="d">Get a ready-to-post ad: headline, caption, hashtags and a call to action.</p>
+      <input placeholder="Product or business (e.g. Zara Logistics)">
+      <select><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>WhatsApp Status</option><option>Flyer</option></select>
+      <select><option>Professional</option><option>Fun and friendly</option><option>Luxury</option><option>Urgent offer</option></select>
+      <textarea placeholder="Offer, price, location or anything customers should know"></textarea>
+      <button class="btn gold" data-ai="ad" data-cost="1500">Generate ad · 1,500 cr</button><div class="out" id="o-ad"></div></div>
+    <div class="card"><h3>Image Studio</h3><p class="d">Flyers, logos and graphics from a description.</p>
+      <input placeholder="Describe the flyer, logo or image you want">
+      <button class="btn gold" data-ai="img" data-cost="500">Generate image · 500 cr</button><div class="out" id="o-img"></div></div>
+  </section>
+
+  <section class="view" id="eng">
+    <h2>Engineering</h2>
+    <div class="card"><h3>Electrical &amp; Robotics</h3><p class="d">Electrical systems, robotics and technical projects, built from idea to working product.</p>
+      <a class="btn teal" href="https://wa.me/2347072167082" target="_blank" rel="noopener">Contact us</a></div>
+  </section>
+
+  <section class="view" id="chat">
+    <h2>Leo</h2>
+    <div class="card"><div class="msgs" id="msgs"></div>
+      <div class="send"><input id="cin" placeholder="Ask Leo anything..." autocomplete="off"><button class="btn teal" id="csend">Send</button></div>
+      <p class="msg">Each message uses 5 credits.</p></div>
+  </section>
+
+  <section class="view" id="credits">
+    <h2>Credits</h2>
+    <div class="card bal"><div class="donut" id="donut"><i class="cr">0</i></div><div><span>Available balance</span><b><span class="cr" style="color:inherit;font-size:inherit">0</span> credits</b><span>Used for AI Studio tools</span></div></div>
+    <div class="card"><h3>Top up</h3><p class="d">Choose a pack.</p>
+      <button class="pack on" data-n="1000" data-p="1000"><span>1,000 credits<small>Starter</small></span><span>₦1,000</span></button>
+      <button class="pack" data-n="5000" data-p="4500"><span>5,000 credits<small>Most popular</small></span><span>₦4,500</span></button>
+      <button class="pack" data-n="10000" data-p="8000"><span>10,000 credits<small>Best value</small></span><span>₦8,000</span></button>
+      <p class="d" style="margin:14px 0 8px">Payment method</p>
+      <div class="seg two" id="method"><button class="on" data-m="card">Card</button><button data-m="bank">Bank transfer</button></div>
+      <button class="btn teal" id="pay" style="width:100%;margin-top:16px">Pay now</button><p class="msg" id="paymsg"></p></div>
+    <div class="card"><h3>History</h3><div class="hist" id="hist"></div></div>
+  </section>
+
+  <section class="view" id="settings">
+    <h2>Settings</h2>
+    <div class="card"><h3>Profile</h3><p class="d">Your name and photo.</p>
+      <div class="prof"><div class="av" id="pav">L</div><label class="file">Change photo<input type="file" id="pfile" accept="image/*" class="hide"></label></div>
+      <input id="pname" placeholder="Name"><input id="pmail" placeholder="Email" readonly>
+      <button class="btn teal" id="psave" style="width:100%">Save profile</button><p class="msg" id="pmsg"></p></div>
+    <div class="card"><h3>Appearance</h3><p class="d">Choose how LegendTech looks.</p>
+      <div class="seg" id="theme"><button data-t="dark">Dark</button><button data-t="light">Light</button><button data-t="system">System</button></div></div>
+    <div class="card"><h3>Account</h3><p class="d">Sign out of this device.</p><button class="btn red" id="logout" style="width:100%">Log out</button></div>
+  </section>
+</main>
+
+<nav>
+  <button class="on" data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/></svg>Home</button>
+  <button data-go="studio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>AI Studio</button>
+  <button class="mid" data-go="credits" aria-label="Credits"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button data-go="eng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Engineering</button>
+  <button data-go="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg>Profile</button>
+</nav>
+</div>
+
+<script>
+/* ===== SETUP: fill these in when ready (see instructions) ===== */
+var API_URL=""; /* address of your AI backend (needed for Leo, ads, images and websites) */
+var FIREBASE={apiKey:"",authDomain:"",projectId:"",appId:""}; /* enables Google + GitHub sign-in */
+var PAYSTACK_KEY=""; /* your Paystack PUBLIC key (pk_...) enables card / bank transfer payment */
+
+function $(s){return document.querySelector(s)}
+function $$(s){return document.querySelectorAll(s)}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return null}}
+
+/* New logo: an L with an orbiting gold sphere */
+var LOGO='<svg class="mark" viewBox="0 0 100 100"><g class="ring"><ellipse cx="50" cy="54" rx="47" ry="16" transform="rotate(-28 50 54)" fill="none" stroke="url(#rg)" stroke-width="2.5"/></g><path class="L" d="M30 18V68Q30 80 42 80H78" fill="none" stroke="url(#tg)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 22V66" stroke="#fff" stroke-opacity=".35" stroke-width="3.5" stroke-linecap="round" fill="none"/><circle class="orb" cx="68" cy="34" r="13" fill="url(#gg)"/><circle class="hl" cx="64" cy="30" r="4" fill="#fff" fill-opacity=".55"/></svg>';
+$$('[data-logo]').forEach(function(e){var s=document.createElement('span');s.innerHTML=LOGO;s.className=e.className;e.replaceWith(s)});
+
+/* Loading animation */
+function busy(txt,ms,cb){$('#ltxt').textContent=txt||'Loading...';$('#load').classList.add('on');
+  return setTimeout(function(){$('#load').classList.remove('on');if(cb)cb()},ms||700)}
+function idle(){$('#load').classList.remove('on')}
+
+/* State */
+var user=null,credits=+(ls('lt_credits')||5000),hist=[];
+try{hist=JSON.parse(ls('lt_hist')||'[]')}catch(e){}
+function load(){try{user=JSON.parse(ls('lt_user'))}catch(e){user=null}}
+function save(){ls('lt_user',JSON.stringify(user))}
+function paintCredits(){
+  $$('.cr').forEach(function(e){e.textContent=credits.toLocaleString()});
+  $('#donut').style.setProperty('--p',Math.min(100,credits/100)+'%');
+  $('#hist').innerHTML=hist.length?hist.slice(0,8).map(function(h){return '<div><span>'+h.t+'</span><b>'+h.n+'</b></div>'}).join(''):'<p class="d" style="margin:0">No purchases yet.</p>';
+}
+function paintUser(){
+  var i=(user.name||'L').trim().charAt(0).toUpperCase();
+  ['#hav','#pav'].forEach(function(s){var e=$(s);e.textContent=user.pic?'':i;e.style.backgroundImage=user.pic?'url("'+user.pic+'")':''});
+  $('#pname').value=user.name||'';$('#pmail').value=user.email||'';paintCredits();
+}
+function enter(){$('#auth').classList.add('hide');$('#app').classList.remove('hide');paintUser()}
+function leave(){$('#app').classList.add('hide');$('#auth').classList.remove('hide')}
+
+/* Sign in */
+$('#signin').onclick=function(){
+  var n=$('#lname').value.trim(),m=$('#lmail').value.trim();
+  if(!n||!/^\S+@\S+\.\S+$/.test(m)){$('#lmsg').textContent='Enter your name and a valid email address.';return}
+  busy('Signing you in...',900,function(){user={name:n,email:m,pic:''};save();enter()});
+};
+function loadJS(u,cb){var s=document.createElement('script');s.src=u;s.onload=cb;s.onerror=function(){idle();$('#lmsg').textContent='Could not load sign-in. Check your network.'};document.head.appendChild(s)}
+var fbReady=false;
+function social(p){
+  if(!FIREBASE.apiKey){$('#lmsg').textContent='Google and GitHub sign-in are not connected yet. Use your name and email below.';return}
+  busy('Connecting...',60000);
+  function go(){
+    if(!fbReady){firebase.initializeApp(FIREBASE);fbReady=true}
+    var pr=p==='google'?new firebase.auth.GoogleAuthProvider():new firebase.auth.GithubAuthProvider();
+    firebase.auth().signInWithPopup(pr).then(function(r){var u=r.user;
+      user={name:u.displayName||u.email,email:u.email||'',pic:u.photoURL||''};save();idle();enter()
+    }).catch(function(){idle();$('#lmsg').textContent='Sign-in was cancelled or failed. Try again.'});
+  }
+  if(window.firebase&&firebase.auth)go();
+  else loadJS('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',function(){loadJS('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js',go)});
+}
+$$('.soc').forEach(function(b){b.onclick=function(){social(b.dataset.p)}});
+$('#logout').onclick=function(){busy('Signing out...',600,function(){user=null;ls('lt_user',null);show('home');leave()})};
+
+/* Profile */
+$('#psave').onclick=function(){busy('Saving...',500,function(){user.name=$('#pname').value.trim()||user.name;save();paintUser();$('#pmsg').textContent='Profile saved.'})};
+$('#pfile').onchange=function(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){
+    var c=document.createElement('canvas'),s=Math.min(im.width,im.height);c.width=c.height=240;
+    c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,240,240);
+    user.pic=c.toDataURL('image/jpeg',.85);save();paintUser();$('#pmsg').textContent='Photo updated.'};im.src=r.result};
+  r.readAsDataURL(f);
+};
+
+/* Navigation */
+function show(id){
+  $$('.view').forEach(function(v){v.classList.toggle('on',v.id===id)});
+  $$('nav button').forEach(function(b){b.classList.toggle('on',b.dataset.go===id)});
+  window.scrollTo(0,0);
+}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)show(b.dataset.go)});
+
+/* Theme */
+var mq=window.matchMedia('(prefers-color-scheme: light)');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t==='system'?(mq.matches?'light':'dark'):t);
+  $$('#theme button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t)})}
+$$('#theme button').forEach(function(b){b.onclick=function(){ls('lt_theme',b.dataset.t);applyTheme(b.dataset.t)}});
+applyTheme(ls('lt_theme')||'dark');
+
+/* Credits + payment */
+var pack=$('.pack.on'),method='card';
+$$('.pack').forEach(function(p){p.onclick=function(){$$('.pack').forEach(function(x){x.classList.remove('on')});p.classList.add('on');pack=p}});
+$$('#method button').forEach(function(b){b.onclick=function(){$$('#method button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');method=b.dataset.m}});
+function addCredits(n){credits+=n;ls('lt_credits',credits);hist.unshift({t:new Date().toLocaleDateString(),n:'+'+n.toLocaleString()});ls('lt_hist',JSON.stringify(hist));paintCredits()}
+$('#pay').onclick=function(){
+  var n=+pack.dataset.n,price=+pack.dataset.p;
+  if(!PAYSTACK_KEY){$('#paymsg').textContent='Online payment is not switched on yet. Please contact support to top up.';return}
+  busy('Opening secure payment...',60000);
+  loadJS('https://js.paystack.co/v1/inline.js',function(){
+    idle();
+    PaystackPop.setup({key:PAYSTACK_KEY,email:user.email||'customer@legendtech.app',amount:price*100,currency:'NGN',
+      channels:method==='card'?['card']:['bank_transfer'],
+      callback:function(){addCredits(n);$('#paymsg').textContent='Payment received. Credits added.'},
+      onClose:function(){$('#paymsg').textContent='Payment window closed.'}}).openIframe();
+  });
+};
+
+/* AI tools. Real generation needs a backend at API_URL. */
+function spend(c){credits=Math.max(0,credits-c);ls('lt_credits',credits);paintCredits()}
+function ask(type,payload,cb,fail){
+  busy('Generating...',60000);
+  fetch(API_URL+'/'+type,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,data:payload})})
+    .then(function(r){return r.json()}).then(function(d){idle();cb(d)}).catch(function(){idle();fail()});
+}
+$$('[data-ai]').forEach(function(b){b.onclick=function(){
+  var out=$('#o-'+b.dataset.ai),cost=+b.dataset.cost;
+  if(cost>credits){out.textContent='Not enough credits. Tap + to top up.';return}
+  if(!API_URL){busy('Generating...',1400,function(){out.textContent='This tool is coming soon. No credits were used.'});return}
+  var f=[].map.call(b.closest('.card').querySelectorAll('input,textarea,select'),function(e){return e.value});
+  out.textContent='';
+  ask(b.dataset.ai,f,function(d){spend(cost);
+    out.innerHTML='';
+    if(d.image){var i=new Image();i.src=d.image;out.appendChild(i)}
+    if(d.text){var t=document.createElement('div');t.className='res';t.textContent=d.text;out.appendChild(t)}
+  },function(){out.textContent='Something went wrong. Try again. No credits were used.'});
+}});
+
+/* Leo chatbot */
+var chat=[];
+function bubble(t,who){var d=document.createElement('div');d.className='m '+who;d.textContent=t;$('#msgs').appendChild(d);$('#msgs').scrollTop=1e6;return d}
+bubble("Hi, I'm Leo, the LegendTech assistant. Ask me anything, or tell me what you want to create: an ad, a flyer, a website or an engineering idea.",'bot');
+function sendChat(){
+  var i=$('#cin'),t=i.value.trim();if(!t)return;
+  if(credits<5){bubble('You need at least 5 credits to chat. Tap + to top up.','bot');return}
+  i.value='';bubble(t,'me');chat.push({role:'user',content:t});
+  if(!API_URL){setTimeout(function(){bubble("I'm not connected yet, but I'll be live soon. For help right now, message support on WhatsApp: 0707 216 7082.",'bot')},700);return}
+  var w=bubble('...','bot');
+  fetch(API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,messages:chat.slice(-12)})})
+    .then(function(r){return r.json()}).then(function(d){w.textContent=d.text;chat.push({role:'assistant',content:d.text});spend(5)})
+    .catch(function(){w.textContent='Sorry, something went wrong. Try again.'});
+}
+$('#csend').onclick=sendChat;
+$('#cin').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat()});
+
+/* Start: logo reveal, then app or sign-in */
+load();paintCredits();
+setTimeout(function(){$('#intro').classList.add('done');user?enter():leave()},3600);
+</script>
+</body>
+</html>
