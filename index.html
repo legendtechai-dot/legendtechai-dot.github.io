@@ -120,6 +120,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--teal)}
 .m{max-width:85%;padding:12px 15px;border-radius:16px;font-size:.93rem;line-height:1.5;white-space:pre-wrap}
 .m.bot{background:var(--input);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
 .m.me{background:linear-gradient(135deg,var(--teal),#0aa893);color:#02221d;align-self:flex-end;border-bottom-right-radius:4px;font-weight:600}
+.att{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}.att label.btn{flex:none;padding:12px 16px;cursor:pointer;font-size:.85rem}.att img{width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid var(--line)}.att .att-x{font-size:.82rem;color:#ef5b53;font-weight:700}
 .send{display:flex;gap:8px}.send input{margin:0}.send .btn{flex:none;padding:0 20px}
 .out img{width:100%;border-radius:14px;margin-top:10px}.out .res{white-space:pre-wrap;color:var(--text);line-height:1.55;margin-top:6px}
 nav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:540px;background:var(--bg2);border:1px solid var(--line);border-radius:24px;display:flex;justify-content:space-around;align-items:center;padding:8px;z-index:30;box-shadow:0 10px 40px rgba(0,0,0,.35)}
@@ -187,15 +188,18 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
     <h2>AI Studio</h2>
     <div class="card"><h3>Web Architect</h3><p class="d">Describe a business and get a website for it.</p>
       <input placeholder="Business name (e.g. Zara Logistics)"><textarea placeholder="What does this business do?"></textarea>
+      <div class="att"><label class="btn">+ Attach logo or image<input type="file" accept="image/*" class="hide att-in"></label><img class="att-prev hide" alt=""><button class="att-x hide" type="button">Remove</button></div>
       <div class="row"><button class="btn" data-ai="web" data-cost="0">Free preview</button><button class="btn teal" data-ai="web" data-cost="1000">Build · 1,000 cr</button></div><div class="out" id="o-web"></div></div>
     <div class="card"><h3>Ad Studio</h3><p class="d">Get a ready-to-post ad: headline, caption, hashtags and a call to action.</p>
       <input placeholder="Product or business (e.g. Zara Logistics)">
       <select><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>WhatsApp Status</option><option>Flyer</option></select>
       <select><option>Professional</option><option>Fun and friendly</option><option>Luxury</option><option>Urgent offer</option></select>
       <textarea placeholder="Offer, price, location or anything customers should know"></textarea>
+      <div class="att"><label class="btn">+ Attach image<input type="file" accept="image/*" class="hide att-in"></label><img class="att-prev hide" alt=""><button class="att-x hide" type="button">Remove</button></div>
       <button class="btn gold" data-ai="ad" data-cost="1500">Generate ad · 1,500 cr</button><div class="out" id="o-ad"></div></div>
     <div class="card"><h3>Image Studio</h3><p class="d">Flyers, logos and graphics from a description.</p>
       <input placeholder="Describe the flyer, logo or image you want">
+      <div class="att"><label class="btn">+ Attach image<input type="file" accept="image/*" class="hide att-in"></label><img class="att-prev hide" alt=""><button class="att-x hide" type="button">Remove</button></div>
       <button class="btn gold" data-ai="img" data-cost="500">Generate image · 500 cr</button><div class="out" id="o-img"></div></div>
   </section>
 
@@ -208,6 +212,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
   <section class="view" id="chat">
     <h2>Leo</h2>
     <div class="card"><div class="msgs" id="msgs"></div>
+      <div class="att" id="chatatt"><label class="btn">+ Attach image<input type="file" accept="image/*" class="hide att-in"></label><img class="att-prev hide" alt=""><button class="att-x hide" type="button">Remove</button></div>
       <div class="send"><input id="cin" placeholder="Ask Leo anything..." autocomplete="off"><button class="btn teal" id="csend">Send</button></div>
       <p class="msg">Each message uses 5 credits.</p></div>
   </section>
@@ -353,23 +358,32 @@ $('#pay').onclick=function(){
 
 /* AI tools. Real generation needs a backend at API_URL. */
 function spend(c){credits=Math.max(0,credits-c);ls('lt_credits',credits);paintCredits()}
-function ask(type,payload,cb,fail){
+function ask(type,payload,cb,fail,img){
   busy('Generating...',60000);
-  fetch(API_URL+'/'+type,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,data:payload})})
-    .then(function(r){return r.json()}).then(function(d){idle();cb(d)}).catch(function(){idle();fail()});
+  fetch(API_URL+'/'+type,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,data:payload,image:img||''})})
+    .then(function(r){return r.json()}).then(function(d){idle();if(d.error){fail(d.error);return}cb(d)}).catch(function(){idle();fail()});
 }
 $$('[data-ai]').forEach(function(b){b.onclick=function(){
   var out=$('#o-'+b.dataset.ai),cost=+b.dataset.cost;
   if(cost>credits){out.textContent='Not enough credits. Tap + to top up.';return}
   if(!API_URL){busy('Generating...',1400,function(){out.textContent='This tool is coming soon. No credits were used.'});return}
-  var f=[].map.call(b.closest('.card').querySelectorAll('input,textarea,select'),function(e){return e.value});
+  var card=b.closest('.card'),f=[].map.call(card.querySelectorAll('input:not([type=file]),textarea,select'),function(e){return e.value});var img=(card.querySelector('.att')||{dataset:{}}).dataset.img||'';
   out.textContent='';
-  ask(b.dataset.ai,f,function(d){spend(cost);
+  ask(b.dataset.ai,f,function(d){if(d.credits!=null){credits=d.credits;ls('lt_credits',credits);paintCredits()}
     out.innerHTML='';
     if(d.image){var i=new Image();i.src=d.image;out.appendChild(i)}
     if(d.text){var t=document.createElement('div');t.className='res';t.textContent=d.text;out.appendChild(t)}
-  },function(){out.textContent='Something went wrong. Try again. No credits were used.'});
+  },function(m){out.textContent=(m||'Something went wrong. Try again.')+' No credits were used.'},img);
 }});
+
+/* Attach an image (resized to keep uploads small) */
+function readImage(file,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){
+  var k=Math.min(1,1024/Math.max(im.width,im.height)),c=document.createElement('canvas');
+  c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  cb(c.toDataURL('image/jpeg',.85))};im.src=r.result};r.readAsDataURL(file)}
+$$('.att-in').forEach(function(inp){inp.onchange=function(){var f=inp.files[0];if(!f)return;var w=inp.closest('.att');
+  readImage(f,function(d){w.dataset.img=d;var p=w.querySelector('.att-prev');p.src=d;p.classList.remove('hide');w.querySelector('.att-x').classList.remove('hide')})}});
+$$('.att-x').forEach(function(b){b.onclick=function(){var w=b.closest('.att');delete w.dataset.img;w.querySelector('.att-prev').classList.add('hide');b.classList.add('hide');w.querySelector('.att-in').value=''}});
 
 /* Leo chatbot */
 var chat=[];
@@ -380,10 +394,11 @@ function sendChat(){
   if(credits<5){bubble('You need at least 5 credits to chat. Tap + to top up.','bot');return}
   i.value='';bubble(t,'me');chat.push({role:'user',content:t});
   if(!API_URL){setTimeout(function(){bubble("I'm not connected yet, but I'll be live soon. For help right now, message support on WhatsApp: 0707 216 7082.",'bot')},700);return}
+  var att=$('#chatatt'),img=att.dataset.img||'';if(img)att.querySelector('.att-x').click();
   var w=bubble('...','bot');
-  fetch(API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,messages:chat.slice(-12)})})
-    .then(function(r){return r.json()}).then(function(d){w.textContent=d.text;chat.push({role:'assistant',content:d.text});spend(5)})
-    .catch(function(){w.textContent='Sorry, something went wrong. Try again.'});
+  fetch(API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,messages:chat.slice(-12),image:img})})
+    .then(function(r){return r.json()}).then(function(d){if(d.error){w.textContent=d.error;return}w.textContent=d.text;chat.push({role:'assistant',content:d.text});if(d.credits!=null){credits=d.credits;ls('lt_credits',credits);paintCredits()}})
+    .catch(function(){w.textContent='Sorry, could not reach Leo. No credits were used.'});
 }
 $('#csend').onclick=sendChat;
 $('#cin').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat()});
