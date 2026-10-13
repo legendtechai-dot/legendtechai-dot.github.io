@@ -226,9 +226,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offse
       <button class="pack on" data-n="1000" data-p="1000"><span>1,000 credits<small>Starter</small></span><span>₦1,000</span></button>
       <button class="pack" data-n="5000" data-p="4500"><span>5,000 credits<small>Most popular</small></span><span>₦4,500</span></button>
       <button class="pack" data-n="10000" data-p="8000"><span>10,000 credits<small>Best value</small></span><span>₦8,000</span></button>
-      <p class="d" style="margin:14px 0 8px">Payment method</p>
-      <div class="seg two" id="method"><button class="on" data-m="card">Card</button><button data-m="bank">Bank transfer</button></div>
-      <button class="btn teal" id="pay" style="width:100%;margin-top:16px">Pay now</button><p class="msg" id="paymsg"></p></div>
+      <p class="d" style="margin:14px 0 0">Pay by bank transfer. Your credits are added once we confirm your transfer.</p><button class="btn teal" id="pay" style="width:100%;margin-top:16px">Continue to bank transfer</button><div class="msg" id="paymsg" style="line-height:1.6"></div></div>
     <div class="card"><h3>History</h3><div class="hist" id="hist"></div></div>
   </section>
 
@@ -347,19 +345,21 @@ var pack=$('.pack.on'),method='card';
 $$('.pack').forEach(function(p){p.onclick=function(){$$('.pack').forEach(function(x){x.classList.remove('on')});p.classList.add('on');pack=p}});
 $$('#method button').forEach(function(b){b.onclick=function(){$$('#method button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');method=b.dataset.m}});
 function addCredits(n){credits+=n;ls('lt_credits',credits);hist.unshift({t:new Date().toLocaleDateString(),n:'+'+n.toLocaleString()});ls('lt_hist',JSON.stringify(hist));paintCredits()}
+/* Bank transfer top-up. Set your real account details here. */
+var BANK={name:'Yahaya Ayomide Olatunbosun',bank:'Kuda',number:'2082173566'};
 $('#pay').onclick=function(){
   var n=+pack.dataset.n,price=+pack.dataset.p;
-  if(!PAYSTACK_KEY){$('#paymsg').textContent='Online payment is not switched on yet. Please contact support to top up.';return}
-  busy('Opening secure payment...',60000);
-  loadJS('https://js.paystack.co/v1/inline.js',function(){
-    idle();
-    PaystackPop.setup({key:PAYSTACK_KEY,email:user.email||'customer@legendtech.app',amount:price*100,currency:'NGN',
-      channels:method==='card'?['card']:['bank_transfer'],
-      callback:function(){addCredits(n);$('#paymsg').textContent='Payment received. Credits added.'},
-      onClose:function(){$('#paymsg').textContent='Payment window closed.'}}).openIframe();
-  });
+  var ref='LT-'+Math.random().toString(36).slice(2,7).toUpperCase();
+  $('#paymsg').innerHTML='<div class="card" style="padding:16px;margin:0 0 12px"><b>Send ₦'+price.toLocaleString()+' to:</b><br>'+BANK.name+'<br>'+BANK.bank+' · '+BANK.number+'<br><br><b>Transfer description (important):</b><br><span style="color:var(--gold);font-weight:800;font-size:1.1rem">'+ref+'</span></div><p class="d" style="margin:0 0 12px">Make the transfer, then tap below. Credits are added once we confirm it, usually within the hour.</p><button class="btn teal" id="paid" style="width:100%">I have paid</button>';
+  $('#paid').onclick=function(){
+    var btn=this;btn.disabled=true;btn.textContent='Sending...';
+    fetch(API_URL+'/topup-request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,credits:n,reference:ref})})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.error){$('#paymsg').textContent=d.error;btn.disabled=false;btn.textContent='I have paid';return}
+      $('#paymsg').innerHTML='Thank you. We received your request for '+n.toLocaleString()+' credits with reference <b>'+ref+'</b>. If credits do not appear within an hour, WhatsApp 0707 216 7082 with that reference.';
+    }).catch(function(){$('#paymsg').textContent='Could not send. Check your connection and try again.';btn.disabled=false;btn.textContent='I have paid'});
+  };
 };
-
 /* AI tools. Real generation needs a backend at API_URL. */
 function spend(c){credits=Math.max(0,credits-c);ls('lt_credits',credits);paintCredits()}
 function ask(type,payload,cb,fail,img){
@@ -407,8 +407,12 @@ function sendChat(){
 $('#csend').onclick=sendChat;
 $('#cin').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat()});
 
+/* Balance from the server (so approved top-ups show up) */
+function refreshBalance(){if(!user)return;fetch(API_URL+'/balance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email})})
+  .then(function(r){return r.json()}).then(function(d){if(d.credits!=null){credits=d.credits;ls('lt_credits',credits);paintCredits()}}).catch(function(){})}
+
 /* Start: logo reveal, then app or sign-in */
-load();paintCredits();
+load();paintCredits();refreshBalance();
 setTimeout(function(){$('#intro').classList.add('done');user?enter():leave()},3600);
 </script>
 </body>
