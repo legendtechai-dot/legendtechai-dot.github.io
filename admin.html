@@ -1,1 +1,66 @@
-hello word
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>LegendTech Admin</title>
+<style>
+body{background:#070a0d;color:#f1f5f9;font-family:system-ui,sans-serif;margin:0;padding:20px;max-width:640px;margin:0 auto}
+h1{font-size:1.4rem;margin:8px 0 16px}
+input{width:100%;background:#12171d;border:1px solid #223;border-radius:12px;padding:14px;color:#fff;font-size:1rem;margin-bottom:10px}
+button{border:0;border-radius:12px;padding:12px 16px;font-weight:700;font-size:.95rem;cursor:pointer}
+.go{background:#19d3b8;color:#02221d;width:100%}
+.ok{background:#1f9d55;color:#fff}.no{background:#b43c3c;color:#fff}
+.item{background:#12171d;border:1px solid #223;border-radius:16px;padding:16px;margin-bottom:12px}
+.ref{font-size:1.15rem;font-weight:800;color:#ffc83a;letter-spacing:.04em}
+.muted{color:#8d99a8;font-size:.9rem;margin:4px 0 10px}
+.row{display:flex;gap:10px}.row button{flex:1}
+#msg{color:#8d99a8;min-height:1.3em;margin:8px 0}
+</style>
+</head>
+<body>
+<h1>Credit requests</h1>
+<input id="pw" type="password" placeholder="Admin password" autocomplete="current-password">
+<button class="go" id="load">Load pending requests</button>
+<p id="msg"></p>
+<div id="list"></div>
+<script>
+var API_URL="https://legendtech-api.legendtechai.workers.dev";
+var pw="";
+function post(path,data){
+  return fetch(API_URL+'/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({password:pw},data))})
+    .then(function(r){return r.json()});
+}
+function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
+function render(items){
+  var box=document.getElementById('list');
+  if(!items.length){box.innerHTML='<p class="muted">No pending requests.</p>';return}
+  box.innerHTML=items.map(function(r){
+    return '<div class="item"><div class="ref">'+esc(r.ref)+'</div>'
+      +'<div class="muted">'+esc(r.user)+'<br>'+r.credits.toLocaleString()+' credits · ₦'+r.amount.toLocaleString()+'<br>'+esc(new Date(r.created).toLocaleString())+'</div>'
+      +'<div class="row"><button class="ok" data-ref="'+esc(r.ref)+'" data-act="approve">Approve</button><button class="no" data-ref="'+esc(r.ref)+'" data-act="reject">Reject</button></div></div>';
+  }).join('');
+  box.querySelectorAll('button[data-ref]').forEach(function(b){
+    b.onclick=function(){
+      b.disabled=true;
+      post('admin-action',{ref:b.dataset.ref,action:b.dataset.act}).then(function(d){
+        if(d.error){document.getElementById('msg').textContent=d.error;b.disabled=false;return}
+        document.getElementById('msg').textContent=b.dataset.ref+' '+d.status+'.';
+        b.closest('.item').remove();
+      }).catch(function(){document.getElementById('msg').textContent='Network error. Try again.';b.disabled=false});
+    };
+  });
+}
+document.getElementById('load').onclick=function(){
+  pw=document.getElementById('pw').value;
+  document.getElementById('msg').textContent='Loading...';
+  post('admin-list',{}).then(function(d){
+    if(d.error){document.getElementById('msg').textContent=d.error;return}
+    document.getElementById('msg').textContent='';
+    render(d.items);
+  }).catch(function(){document.getElementById('msg').textContent='Network error.'});
+};
+</script>
+</body>
+</html>
