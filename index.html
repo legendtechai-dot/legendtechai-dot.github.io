@@ -374,6 +374,20 @@ $('#pay').onclick=function(){
 };
 /* AI tools. Real generation needs a backend at API_URL. */
 function spend(c){credits=Math.max(0,credits-c);ls('lt_credits',credits);paintCredits()}
+function adVisual(reply,out){
+  var m=/<svg[\s\S]*<\/svg>/i.exec(reply);var svg=m[0];
+  var caption=reply.replace(svg,'').replace(/CAPTION:/i,'').trim();
+  var url='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svg)));
+  var im=document.createElement('img');im.src=url;im.alt='Your ad';
+  im.style.cssText='width:100%;border-radius:14px;border:1px solid var(--line);margin-top:10px;background:#fff';
+  out.appendChild(im);
+  var png=document.createElement('button');png.className='btn teal';png.style.cssText='width:100%;margin-top:10px';png.textContent='Download ad (PNG)';
+  png.onclick=function(){var pic=new Image();pic.onload=function(){var c=document.createElement('canvas');c.width=1080;c.height=1080;c.getContext('2d').drawImage(pic,0,0,1080,1080);c.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='legendtech-ad.png';a.click()},'image/png')};pic.src=url};
+  out.appendChild(png);
+  if(caption){var t=document.createElement('div');t.className='res';t.textContent=caption;out.appendChild(t);
+    var cp=document.createElement('button');cp.className='btn';cp.style.cssText='width:100%;margin-top:10px';cp.textContent='Copy caption';
+    cp.onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(caption);cp.textContent='Copied'};out.appendChild(cp)}
+}
 function extractHtml(t){var m=/```(?:html)?\s*([\s\S]*?)```/i.exec(t);return (m?m[1]:t).trim()}
 function ask(type,payload,cb,fail,img){
   busy('Generating...',60000);
@@ -397,6 +411,8 @@ $$('[data-ai]').forEach(function(b){b.onclick=function(){
       var dl=document.createElement('button');dl.className='btn teal';dl.style.cssText='width:100%;margin-top:10px';dl.textContent='Download website file';
       dl.onclick=function(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([code],{type:'text/html'}));a.download='index.html';a.click()};
       out.appendChild(dl);
+    } else if(d.text&&b.dataset.ai==='ad'&&/<svg/i.test(d.text)){
+      adVisual(d.text,out);
     } else if(d.text){
       var t=document.createElement('div');t.className='res';t.textContent=d.text;out.appendChild(t);
       var cp=document.createElement('button');cp.className='btn';cp.style.cssText='width:100%;margin-top:10px';cp.textContent='Copy text';
