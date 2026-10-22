@@ -374,6 +374,7 @@ $('#pay').onclick=function(){
 };
 /* AI tools. Real generation needs a backend at API_URL. */
 function spend(c){credits=Math.max(0,credits-c);ls('lt_credits',credits);paintCredits()}
+function extractHtml(t){var m=/```(?:html)?\s*([\s\S]*?)```/i.exec(t);return (m?m[1]:t).trim()}
 function ask(type,payload,cb,fail,img){
   busy('Generating...',60000);
   fetch(API_URL+'/'+type,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,data:payload,image:img||''})})
@@ -388,7 +389,20 @@ $$('[data-ai]').forEach(function(b){b.onclick=function(){
   ask(b.dataset.ai,f,function(d){if(d.credits!=null){credits=d.credits;ls('lt_credits',credits);paintCredits()}
     out.innerHTML='';
     if(d.image){var i=new Image();i.src=d.image;out.appendChild(i)}
-    if(d.text){var t=document.createElement('div');t.className='res';t.textContent=d.text;out.appendChild(t)}
+    if(d.text&&b.dataset.ai==='web'){
+      var code=extractHtml(d.text);
+      var fr=document.createElement('iframe');fr.setAttribute('sandbox','');fr.srcdoc=code;
+      fr.style.cssText='width:100%;height:420px;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:10px';
+      out.appendChild(fr);
+      var dl=document.createElement('button');dl.className='btn teal';dl.style.cssText='width:100%;margin-top:10px';dl.textContent='Download website file';
+      dl.onclick=function(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([code],{type:'text/html'}));a.download='index.html';a.click()};
+      out.appendChild(dl);
+    } else if(d.text){
+      var t=document.createElement('div');t.className='res';t.textContent=d.text;out.appendChild(t);
+      var cp=document.createElement('button');cp.className='btn';cp.style.cssText='width:100%;margin-top:10px';cp.textContent='Copy text';
+      cp.onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(d.text);cp.textContent='Copied'};
+      out.appendChild(cp);
+    }
   },function(m){out.textContent=m||'Something went wrong. Try again.'},img);
 }});
 
