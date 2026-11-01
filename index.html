@@ -365,6 +365,7 @@ $('#pfile').onchange=function(e){
 
 /* Navigation */
 function show(id){
+  if(user) refreshBalance();
   $$('.view').forEach(function(v){v.classList.toggle('on',v.id===id)});
   $$('nav button').forEach(function(b){b.classList.toggle('on',b.dataset.go===id)});
   window.scrollTo(0,0);
@@ -424,7 +425,6 @@ function ask(type,payload,cb,fail,img){
 }
 $$('[data-ai]').forEach(function(b){b.onclick=function(){
   var out=$('#o-'+b.dataset.ai),cost=+b.dataset.cost;
-  if(cost>credits){out.textContent='Not enough credits. Tap + to top up.';return}
   if(!API_URL){busy('Generating...',1400,function(){out.textContent='This tool is coming soon. No credits were used.'});return}
   var card=b.closest('.card'),f=[].map.call(card.querySelectorAll('input:not([type=file]),textarea,select'),function(e){return e.value});var img=(card.querySelector('.att')||{dataset:{}}).dataset.img||'';
   out.textContent='';
