@@ -132,6 +132,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--teal)}
 .m{max-width:85%;padding:12px 15px;border-radius:16px;font-size:.93rem;line-height:1.5;white-space:pre-wrap}
 .m.bot{background:var(--input);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
 .m.me{background:linear-gradient(135deg,var(--teal),#0aa893);color:#02221d;align-self:flex-end;border-bottom-right-radius:4px;font-weight:600}
+.dotwrap{display:flex;flex-direction:column;align-items:center;padding:18px 0}.dotc{width:240px;height:240px;max-width:100%}.dotpct{font-weight:800;font-size:1.6rem;color:var(--teal);margin-top:6px}.dotlbl{color:var(--mut);font-size:.9rem;margin-top:4px}
 .att{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}.att label.btn{flex:none;padding:12px 16px;cursor:pointer;font-size:.85rem}.att img{width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid var(--line)}.att .att-x{font-size:.82rem;color:#ef5b53;font-weight:700}
 .send{display:flex;gap:8px}.send input{margin:0}.send .btn{flex:none;padding:0 20px}
 .out img{width:100%;border-radius:14px;margin-top:10px}.out .res{white-space:pre-wrap;color:var(--text);line-height:1.55;margin-top:6px}
@@ -279,6 +280,32 @@ var LOGO='<svg class="mark" viewBox="0 0 100 100"><g class="ring"><ellipse cx="5
 $$('[data-logo]').forEach(function(e){var s=document.createElement('span');s.innerHTML=LOGO;s.className=e.className;e.replaceWith(s)});
 
 /* Loading animation */
+/* Dot-grid loader with percentage, shown in the result area while the AI works */
+function showLoader(out,label){
+  out.innerHTML='<div class="dotwrap"><canvas class="dotc" width="260" height="260"></canvas><div class="dotpct">0%</div><div class="dotlbl">'+(label||'Working on it')+'</div></div>';
+  var c=out.querySelector('.dotc'),ctx=c.getContext('2d'),pct=out.querySelector('.dotpct');
+  var N=14,gap=260/N,t=0,p=0,target=8,alive=true;
+  var timer=setInterval(function(){ if(p<target) p+=0.6; if(p<92 && target<92) target+=0.15; pct.textContent=Math.floor(p)+'%'; },120);
+  function draw(){
+    if(!alive) return;
+    ctx.clearRect(0,0,260,260);
+    var lit=Math.floor(N*N*p/100);
+    for(var y=0;y<N;y++)for(var x=0;x<N;x++){
+      var i=y*N+x, wave=(Math.sin(t*0.08 + (x+y)*0.45)+1)/2;
+      var on=i<lit;
+      ctx.beginPath();
+      ctx.arc(x*gap+gap/2, y*gap+gap/2, (on?3.2:1.6)+(on?wave*1.6:0), 0, Math.PI*2);
+      ctx.fillStyle=on?'rgba(25,211,184,'+(0.55+wave*0.45)+')':'rgba(25,211,184,0.18)';
+      ctx.fill();
+    }
+    t++; requestAnimationFrame(draw);
+  }
+  draw();
+  return {
+    finish:function(){ alive=false; clearInterval(timer); pct.textContent='100%'; },
+    stop:function(){ alive=false; clearInterval(timer); }
+  };
+}
 function busy(txt,ms,cb){$('#ltxt').textContent=txt||'Loading...';$('#load').classList.add('on');
   return setTimeout(function(){$('#load').classList.remove('on');if(cb)cb()},ms||700)}
 function idle(){$('#load').classList.remove('on')}
@@ -391,8 +418,9 @@ function adVisual(reply,out){
 function extractHtml(t){var m=/```(?:html)?\s*([\s\S]*?)```/i.exec(t);return (m?m[1]:t).trim()}
 function ask(type,payload,cb,fail,img){
   busy('Generating...',60000);
+  var lo=window._lo; window._lo=null;
   fetch(API_URL+'/'+type,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:user.email,data:payload,image:img||''})})
-    .then(function(r){return r.json()}).then(function(d){idle();if(d.error){fail(d.error);return}cb(d)}).catch(function(){idle();fail()});
+    .then(function(r){return r.json()}).then(function(d){idle();if(lo)lo.finish();if(d.error){fail(d.error);return}cb(d)}).catch(function(){idle();if(lo)lo.stop();fail()});
 }
 $$('[data-ai]').forEach(function(b){b.onclick=function(){
   var out=$('#o-'+b.dataset.ai),cost=+b.dataset.cost;
@@ -400,6 +428,8 @@ $$('[data-ai]').forEach(function(b){b.onclick=function(){
   if(!API_URL){busy('Generating...',1400,function(){out.textContent='This tool is coming soon. No credits were used.'});return}
   var card=b.closest('.card'),f=[].map.call(card.querySelectorAll('input:not([type=file]),textarea,select'),function(e){return e.value});var img=(card.querySelector('.att')||{dataset:{}}).dataset.img||'';
   out.textContent='';
+  var label=b.dataset.ai==='web'?'Building your website':b.dataset.ai==='ad'?'Designing your ad':'Creating your image';
+  window._lo=showLoader(out,label);
   ask(b.dataset.ai,f,function(d){if(d.credits!=null){credits=d.credits;ls('lt_credits',credits);paintCredits()}
     out.innerHTML='';
     if(d.image){var i=new Image();i.src=d.image;out.appendChild(i)}
